@@ -140,11 +140,12 @@ obitos_por_causas %>% filter(`Capítulo CID-10` != "TOTAL") %>%
     proporcao_acumulada = max(`Óbitos p/Residênc`)*cumsum(`Óbitos p/Residênc`) / sum(`Óbitos p/Residênc`)
     ) %>%
   ggplot(aes(x = reorder(`Capítulo CID-10`, -`Óbitos p/Residênc`))) +
-    geom_col(aes(y = `Óbitos p/Residênc`)) +
+    geom_col(aes(y = `Óbitos p/Residênc`, fill = `Capítulo CID-10`)) +
     geom_line(aes(y = proporcao_acumulada, group = 1)) +
     scale_y_continuous(sec.axis = sec_axis(trans = ~./16718*100, name = "% acum.", breaks = 1:10*10)) +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
-    xlab("Capítulo CID-10") + ylab("Óbitos")
+    xlab("Capítulo CID-10") + ylab("Óbitos") +
+    scale_fill_fish_d(option = "Hypsypops_rubicundus", direction = -1, guide = FALSE)
 
 ```
 * Cerca de 80% de todos os óbitos estão concentrados em 5 capítulos da CID-10;
