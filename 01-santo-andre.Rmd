@@ -243,7 +243,193 @@ ggplot(data = piramide_obitos_cardio2, aes(x = `Faixa Etária`, y = `Óbitos`, f
   scale_y_continuous(labels = absolute_format())
 ```
 
-* Os óbito por Doenças do Aparelho Circulatório estão concentradas nas faixas estárias mais velhas.
+* Os óbito por Doenças do Aparelho Circulatório estão concentradas nas faixas estárias mais velhas;
+* Porém, nos homens, a faixa etária com o maior número de óbitos foi a de 70 a 79 anos, enquanto nas mulheres, foi a de 80 anos e mais.
+
+
+
+
+**Número de óbitos masculinos residentes por Doenças do Aparelho Circulatório, segundo faixa etária e Grupo da CID-10, Santo André, 2008-2017**
+```{r fig_obitos_masc_idade_tipo_cardiovasculares, fig.height=10, fig.width=15}
+
+obitos_por_idade_e_causas <- sim_obt10_mun(
+  municipio = 354780,
+  linha = "Grupo CID-10",
+  coluna = "Faixa Etária",
+  periodo = c(as.character(2008:2017)),
+  capitulo_cid10 = 9, # Doenças do Aparelho Circulatório
+  sexo = "Masc"
+)
+
+temp <-
+  obitos_por_idade_e_causas %>%
+  filter(!str_detect(obitos_por_idade_e_causas$`Grupo CID-10`, "^\\.")) %>%
+  pivot_longer(2:13, names_to = "Faixa Etária", values_to = "Óbitos") %>%
+  select("Grupo CID-10", "Faixa Etária", "Óbitos") %>%
+  filter(`Grupo CID-10` != "TOTAL") %>%
+  mutate(
+    `Faixa Etária` = factor(
+      `Faixa Etária`,
+      levels = unique(`Faixa Etária`),
+      ordered = TRUE
+      )
+  ) %>%
+  filter(!(is.na(`Óbitos`)))
+
+temp2 <- 
+  temp %>%
+  group_by(`Grupo CID-10`) %>%
+  summarise(sum(`Óbitos`))
+
+temp3 <- 
+  left_join(temp, temp2) %>%
+  mutate(
+    # `Grupo CID-10` = fct_lump(
+    #   `Grupo CID-10`,
+    #   n = 5,
+    #   w = `sum(obitos)`,
+    #   other_level = "Outros"
+    #   ),
+    `Grupo CID-10` = fct_reorder(
+      `Grupo CID-10`,`Óbitos`, sum,.desc = TRUE
+      )
+  )
+
+temp3 %>%
+  ggplot() +
+    geom_col(
+      aes(x = `Faixa Etária`, y = `Óbitos`, fill = `Grupo CID-10`),
+      position = position_stack(reverse = TRUE)
+      ) +
+    scale_fill_fish_d(option = "Hypsypops_rubicundus", direction = 1)
+```
+
+
+
+
+
+**Número de óbitos femininos residentes por Doenças do Aparelho Circulatório, segundo faixa etária e Grupo da CID-10, Santo André, 2008-2017**
+```{r fig_obitos_fem_idade_tipo_cardiovasculares, fig.height=10, fig.width=15}
+
+obitos_por_idade_e_causas <- sim_obt10_mun(
+  municipio = 354780,
+  linha = "Grupo CID-10",
+  coluna = "Faixa Etária",
+  periodo = c(as.character(2008:2017)),
+  capitulo_cid10 = 9, # Doenças do Aparelho Circulatório
+  sexo = "Fem"
+)
+
+temp <-
+  obitos_por_idade_e_causas %>%
+  filter(!str_detect(obitos_por_idade_e_causas$`Grupo CID-10`, "^\\.")) %>%
+  pivot_longer(2:13, names_to = "Faixa Etária", values_to = "Óbitos") %>%
+  select("Grupo CID-10", "Faixa Etária", "Óbitos") %>%
+  filter(`Grupo CID-10` != "TOTAL") %>%
+  mutate(
+    `Faixa Etária` = factor(
+      `Faixa Etária`,
+      levels = unique(`Faixa Etária`),
+      ordered = TRUE
+      )
+  ) %>%
+  filter(!(is.na(`Óbitos`)))
+
+temp2 <- 
+  temp %>%
+  group_by(`Grupo CID-10`) %>%
+  summarise(sum(`Óbitos`))
+
+temp3 <- 
+  left_join(temp, temp2) %>%
+  mutate(
+    # `Grupo CID-10` = fct_lump(
+    #   `Grupo CID-10`,
+    #   n = 5,
+    #   w = `sum(obitos)`,
+    #   other_level = "Outros"
+    #   ),
+    `Grupo CID-10` = fct_reorder(
+      `Grupo CID-10`,`Óbitos`, sum,.desc = TRUE
+      )
+  )
+
+temp3 %>%
+  ggplot() +
+    geom_col(
+      aes(x = `Faixa Etária`, y = `Óbitos`, fill = `Grupo CID-10`),
+      position = position_stack(reverse = TRUE)
+      ) +
+    scale_fill_fish_d(option = "Hypsypops_rubicundus", direction = 1)
+```
+
+
+
+
+**Número de óbitos residentes por Doenças do Aparelho Circtulatório, segundo faixa etária e Grupo da CID-10, Santo André, 2008-2017**
+
+```{r fig_obitos_idade_tipo_cardiovasculares, fig.height=10, fig.width=15}
+
+obitos_por_idade_e_causas <- sim_obt10_mun(
+  municipio = 354780,
+  linha = "Grupo CID-10",
+  coluna = "Faixa Etária",
+  periodo = c(as.character(2008:2017)),
+  capitulo_cid10 = 9, # Doenças do Aparelho Circulatório
+)
+
+temp <-
+  obitos_por_idade_e_causas %>%
+  filter(!str_detect(obitos_por_idade_e_causas$`Grupo CID-10`, "^\\.")) %>%
+  pivot_longer(2:13, names_to = "Faixa Etária", values_to = "Óbitos") %>%
+  select("Grupo CID-10", "Faixa Etária", "Óbitos") %>%
+  filter(`Grupo CID-10` != "TOTAL") %>%
+  mutate(
+    `Faixa Etária` = factor(
+      `Faixa Etária`,
+      levels = unique(`Faixa Etária`),
+      ordered = TRUE
+      )
+  ) %>%
+  filter(!(is.na(`Óbitos`)))
+
+temp2 <- 
+  temp %>%
+  group_by(`Grupo CID-10`) %>%
+  summarise(sum(`Óbitos`))
+
+temp3 <- 
+  left_join(temp, temp2) %>%
+  mutate(
+    # `Grupo CID-10` = fct_lump(
+    #   `Grupo CID-10`,
+    #   n = 5,
+    #   w = `sum(obitos)`,
+    #   other_level = "Outros"
+    #   ),
+    `Grupo CID-10` = fct_reorder(
+      `Grupo CID-10`,`Óbitos`, sum,.desc = TRUE
+      )
+  )
+
+temp3 %>%
+  ggplot() +
+    geom_col(
+      aes(x = `Faixa Etária`, y = `Óbitos`, fill = `Grupo CID-10`),
+      position = position_stack(reverse = TRUE)
+      ) +
+    scale_fill_fish_d(option = "Hypsypops_rubicundus", direction = 1)
+```
+
+* Principal foram as isquêmicas do coração;
+* Em segundo lugar, as cerebrovasculares.
+
+
+
+
+
+
+
 
 
 
