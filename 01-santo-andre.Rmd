@@ -193,4 +193,114 @@ obitos_por_idade_e_causas2 %>%
 
 
 
+### 1.1.3. Doenças do Aparelho Circulatório
+
+**Número de óbitos por Doenças do Aparelho Circulatório, segundo sexo e faixa etária, Santo André, 2008-2017**
+
+```{r fig_piramide_obitos_cardio}
+
+piramide_obitos_cardio <- sim_obt10_mun(
+  municipio = 354780,
+  linha = "Faixa Etária",
+  coluna = "Sexo",
+  periodo = c(as.character(2008:2017)),
+  capitulo_cid10 = 9
+)
+
+piramide_obitos_cardio2 <- piramide_obitos_cardio %>%
+  pivot_longer(cols = c("Masc", "Fem"),
+               names_to = "Sexo",
+               values_to = "Óbitos") %>%
+  filter(!(`Faixa Etária` %in% c("TOTAL", "Idade ignorada"))) %>%
+  mutate(faixa_etaria = factor(`Faixa Etária`,
+                               levels = unique(`Faixa Etária`),
+                               ordered = TRUE))%>%
+  select(`Faixa Etária` = faixa_etaria, Sexo, `Óbitos`)
+
+
+
+# Plota
+absolute_format <- function(accuracy = 1, scale = 1, prefix = "",
+                          suffix = "", big.mark = ".", decimal.mark = ",",
+                          trim = TRUE, ...) {
+  function(x) number(
+      abs(x),
+      accuracy = accuracy,
+      scale = scale,
+      prefix = prefix,
+      suffix = suffix,
+      big.mark = big.mark,
+      decimal.mark = decimal.mark,
+      trim = trim,
+      ...
+    )
+}
+
+ggplot(data = piramide_obitos_cardio2, aes(x = `Faixa Etária`, y = `Óbitos`, fill = Sexo)) +
+  geom_col(data = piramide_obitos_cardio2[piramide_obitos_cardio2$Sexo=="Masc",], aes(y = -`Óbitos`)) +
+  geom_col(data = piramide_obitos_cardio2[piramide_obitos_cardio2$Sexo=="Fem",]) +
+  coord_flip() +
+  scale_y_continuous(labels = absolute_format())
+```
+
+* Os óbito por Doenças do Aparelho Circulatório estão concentradas nas faixas estárias mais velhas.
+
+
+
+
+
+### 1.1.3. Neoplasias
+
+**Número de óbitos por Neoplasias, segundo sexo e faixa etária, Santo André, 2008-2017**
+```{r fig_piramide_obitos_cancer}
+piramide_obitos_cancer <- sim_obt10_mun(
+  municipio = 354780,
+  linha = "Faixa Etária",
+  coluna = "Sexo",
+  periodo = c(as.character(2008:2017)),
+  capitulo_cid10 = 2
+)
+
+piramide_obitos_cancer2 <-
+  piramide_obitos_cancer %>%
+  pivot_longer(cols = c("Masc", "Fem"),
+               names_to = "Sexo",
+               values_to = "Óbitos") %>%
+  filter(!(`Faixa Etária` %in% c("TOTAL", "Idade ignorada"))) %>%
+  mutate(faixa_etaria = factor(`Faixa Etária`,
+                               levels = unique(`Faixa Etária`),
+                               ordered = TRUE))%>%
+  select(`Faixa Etária` = faixa_etaria, Sexo, `Óbitos`)
+
+
+
+# Plota
+absolute_format <- function(accuracy = 1, scale = 1, prefix = "",
+                          suffix = "", big.mark = ".", decimal.mark = ",",
+                          trim = TRUE, ...) {
+  function(x) number(
+      abs(x),
+      accuracy = accuracy,
+      scale = scale,
+      prefix = prefix,
+      suffix = suffix,
+      big.mark = big.mark,
+      decimal.mark = decimal.mark,
+      trim = trim,
+      ...
+    )
+}
+
+ggplot(data = piramide_obitos_cancer2, aes(x = `Faixa Etária`, y = `Óbitos`, fill = Sexo)) +
+  geom_col(data = piramide_obitos_cancer2[piramide_obitos_cancer2$Sexo=="Masc",], aes(y = -`Óbitos`)) +
+  geom_col(data = piramide_obitos_cancer2[piramide_obitos_cancer2$Sexo=="Fem",]) +
+  coord_flip() +
+  scale_y_continuous(labels = absolute_format())
+```
+
+* Óbitos por Neoplasias concentrados nas faixas etárias mais velhas;
+
+
+
+
 
