@@ -1,0 +1,122 @@
+---
+title: "Santo André"
+output:
+  html_notebook:
+    code_fold: hide
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup}
+library(tidyverse)
+
+# Libraries to IMPORT data
+library(pins) # pins remote resources into a local cache to work offline
+library(readxl) # Read Excel Files
+library(read.dbc) # read datasus dbc files
+
+# Libraries for Databases
+library(DBI)
+library(odbc)
+
+# Libraries to TIDY data
+library(janitor) # simple functions for examining and cleaning dirty data
+
+# Libraries to TRANSFORM data
+
+# Libraries to VISUALIZE data
+library(fishualize) # Visualization of fish color palette
+
+
+# Libraries to MODEL data
+#library(broom) # summarizes key information about models in tidy tibble()s.
+#library(corrr) # is a package for exploring correlations in R
+#library(infer) # perform statistical inference
+
+# Other useful libraries
+#library(here) # helps accessing files relative to a project root to stop the working directory insanity
+library(RVerbalExpressions) # Create regular expressions easily
+library(beepr) # Easily Play Notification Sounds on any Platform
+#library(feather) # legacy. fast, interoperable binary data frame storage for R and python
+library(arrow) # substitutes *feather* package and introduces *parquet* file type (hadoop) - fast and small. the gold standard
+library(fst) # fst file type. faster than *parquet* but larger file size. good for ssd (can read from disk as if in memmory, see fst())
+
+
+
+library(sidrar)
+library(datasus)
+library(scales)
+```
+
+## 1.1. DESCRIÇÃO E ANALISE das principais características epidemiológicas e dos problemas de saúde mais prevalentes em Santo André.
+
+### 1.1.1. Envelhecimento Populacional
+
+Figura X—Pirâmide Etária, Santo André, 2000 e 2010
+```{r piramide_etaria, cache=TRUE}
+# Dowload dos dados do site do IBGE
+# População por sexo e faixa etária para criação de uma pirâmide populacional
+# Censos de 2000 e 2010
+piramide <-
+  sidrar::get_sidra(1552,
+            period = c("2000", "2010"),
+            variable = 93, # população residente
+            classific = c("c2", "c287"), # sexo e idade
+            category = list(
+              c(92956, 92957), # homem e mulher
+              c(93070, 93084:93100, 6653) # grupos etários de 5 em 5 anos
+              ),
+            geo = "City",
+            geo.filter = 3547809, # Santo André - SP
+            header = TRUE
+  )
+
+piramide2 <- piramide %>%
+  select(Ano, Sexo, Idade, `População` = Valor) %>%
+  mutate(`Faixa Etária` = factor(Idade, levels = unique(Idade), ordered = TRUE))
+
+homens <- piramide2 %>%
+  filter(Sexo == "Homem") %>%
+  mutate(`População` = `População` * -1)
+
+mulheres <- piramide2 %>%
+  filter(Sexo == "Mulher")
+
+
+# Função para formatação do gráfico
+absolute_format <- function(accuracy = 1, scale = 1, prefix = "",
+                          suffix = "", big.mark = ".", decimal.mark = ",",
+                          trim = TRUE, ...) {
+  function(x) number(
+      abs(x),
+      accuracy = accuracy,
+      scale = scale,
+      prefix = prefix,
+      suffix = suffix,
+      big.mark = big.mark,
+      decimal.mark = decimal.mark,
+      trim = trim,
+      ...
+    )
+}
+
+# Plota
+ggplot(data = piramide2, aes(x = `Faixa Etária`, fill = Sexo)) +
+  geom_col(data = homens, aes(y = `População`)) +
+  geom_col(data = mulheres, aes(y = `População`)) +
+  coord_flip()+
+  facet_wrap(~Ano)+
+  scale_y_continuous(labels = absolute_format())+
+  scale_fill_manual(name = "",
+                    values = c(Homem = "#3E606F", Mulher = "#8C3F4D"),
+                    labels = c("Homens", "Mulheres"))
+
+
+```
+
+* População de Santo André atravessando um processo de envelhecimento populacional;
+* No último censo (2010), a faixa etária com o maior número de pessoas foi a de 25 a 29 anos.
+
+
+
+
