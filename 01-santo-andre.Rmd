@@ -52,8 +52,9 @@ library(scales)
 
 ### 1.1.1. Envelhecimento Populacional
 
-Figura X—Pirâmide Etária, Santo André, 2000 e 2010
-```{r piramide_etaria, cache=TRUE}
+**Figura X—Pirâmide Etária, Santo André, 2000 e 2010**
+
+```{r figx_piramide_etaria, cache=TRUE}
 # Dowload dos dados do site do IBGE
 # População por sexo e faixa etária para criação de uma pirâmide populacional
 # Censos de 2000 e 2010
@@ -117,6 +118,38 @@ ggplot(data = piramide2, aes(x = `Faixa Etária`, fill = Sexo)) +
 * População de Santo André atravessando um processo de envelhecimento populacional;
 * No último censo (2010), a faixa etária com o maior número de pessoas foi a de 25 a 29 anos.
 
+
+
+
+
+
+### 1.1.2 Causas de Morte
+
+**Número e proporção acumulada de óbitos residentes, segundo Capítulo da CID-10, Santo André, 2008-2017**
+
+```{r figx_obitos_causas, fig.height=7, fig.width=7}
+obitos_por_causas <- sim_obt10_mun(
+  municipio = 354780,
+  linha = "Capítulo CID-10",
+  periodo = c(as.character(2008:2017)))
+
+obitos_por_causas %>% filter(`Capítulo CID-10` != "TOTAL") %>%
+  arrange(desc(`Óbitos p/Residênc`)) %>%
+  mutate(
+    `Capítulo CID-10` = str_replace(`Capítulo CID-10`, "^[:upper:]+\\.[:blank:]*", ""),
+    proporcao_acumulada = max(`Óbitos p/Residênc`)*cumsum(`Óbitos p/Residênc`) / sum(`Óbitos p/Residênc`)
+    ) %>%
+  ggplot(aes(x = reorder(`Capítulo CID-10`, -`Óbitos p/Residênc`))) +
+    geom_col(aes(y = `Óbitos p/Residênc`)) +
+    geom_line(aes(y = proporcao_acumulada, group = 1)) +
+    scale_y_continuous(sec.axis = sec_axis(trans = ~./16718*100, name = "% acum.", breaks = 1:10*10)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+    xlab("Capítulo CID-10") + ylab("Óbitos")
+
+```
+* Cerca de 80% de todos os óbitos estão concentrados em 5 capítulos da CID-10;
+* A principal causa de morte foram as Doenças do Aparelho Circulatório, responsáveis por cerca de 35% de todos os óbitos;
+* A segunda principal causa de morte foram as Neoplasias, seguidas das Doenças do Aparelho Circulatório, das Causas Externas de Morbidade e Mortalidade e das Doenças do Aparelho Digestivo.
 
 
 
