@@ -47,6 +47,7 @@ library(fst) # fst file type. faster than *parquet* but larger file size. good f
 library(sidrar)
 library(datasus)
 library(scales)
+library(knitr)
 ```
 
 ## 1.1. DESCRIÇÃO E ANALISE das principais características epidemiológicas e dos problemas de saúde mais prevalentes em Santo André.
@@ -119,6 +120,45 @@ ggplot(data = piramide2, aes(x = `Faixa Etária`, fill = Sexo)) +
 * População de Santo André atravessando um processo de envelhecimento populacional;
 * No último censo (2010), a faixa etária com o maior número de pessoas foi a de 25 a 29 anos.
 * Aumento de idosos, aumento de pessoas dependentes, seja por doenças, seja por fragilidade relacionada à velhice.
+
+
+
+
+```{r tabela_populacao}
+# Dowload dos dados do site do IBGE
+# População por sexo e faixa etária
+# Censo de 2010
+populacao <-
+  sidrar::get_sidra(1552,
+            period = "2010",
+            variable = 93, # população residente
+            classific = c("c2", "c287"), # sexo e idade
+            category = list(
+              c(92956, 92957, 0), # homem, mulher e total
+              c(93070, 93084:93100, 6653, 0) # grupos etários de 5 em 5 anos e total
+              ),
+            geo = "City",
+            geo.filter = 3547809, # Santo André - SP
+            header = TRUE
+  )
+
+populacao2 <-
+  populacao %>%
+  select(Ano, Sexo, Idade, Valor) %>%
+  mutate(`Faixa Etária` = factor(Idade, levels = unique(Idade), ordered = TRUE)) %>%
+  select(Sexo, `Faixa Etária`, Valor) %>%
+  pivot_wider(names_from = Sexo, values_from = Valor) %>%
+  mutate(Total = `Homem` + `Mulher`)
+  
+kable(
+  populacao2,
+  digits = 2, format.args = list(big.mark = ".", decimal.mark = ",")
+)
+```
+
+
+
+
 
 
 
