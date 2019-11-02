@@ -433,8 +433,8 @@ temp3 %>%
 
 **Número de óbitos por Doenças do Aparelho Respiratório, segundo sexo e faixa etária, Santo André, 2008-2017**
 
-```{r fig_piramide_obitos_causasexternas}
-piramide_obitos_causas_externas <- sim_obt10_mun(
+```{r fig_piramide_obitos_respiratorias}
+piramide_obitos_respiratorias <- sim_obt10_mun(
   municipio = 354780,
   linha = "Faixa Etária",
   coluna = "Sexo",
@@ -442,7 +442,7 @@ piramide_obitos_causas_externas <- sim_obt10_mun(
   capitulo_cid10 = 10 # Doenças do Aparelho Respiratório
 )
 
-piramide_obitos_causas_externas2 <-  piramide_obitos_causas_externas %>%
+piramide_obitos_respiratorias2 <-  piramide_obitos_respiratorias %>%
   pivot_longer(cols = c("Masc", "Fem"),
                names_to = "Sexo",
                values_to = "Óbitos") %>%
@@ -471,14 +471,73 @@ absolute_format <- function(accuracy = 1, scale = 1, prefix = "",
     )
 }
 
-ggplot(data = piramide_obitos_causas_externas2, aes(x = `Faixa Etária`, y = `Óbitos`, fill = Sexo)) +
-  geom_col(data = piramide_obitos_causas_externas2[piramide_obitos_causas_externas2$Sexo=="Masc",], aes(y = -`Óbitos`)) +
-  geom_col(data = piramide_obitos_causas_externas2[piramide_obitos_causas_externas2$Sexo=="Fem",]) +
+ggplot(data = piramide_obitos_respiratorias2, aes(x = `Faixa Etária`, y = `Óbitos`, fill = Sexo)) +
+  geom_col(data = piramide_obitos_respiratorias2[piramide_obitos_respiratorias2$Sexo=="Masc",], aes(y = -`Óbitos`)) +
+  geom_col(data = piramide_obitos_respiratorias2[piramide_obitos_respiratorias2$Sexo=="Fem",]) +
   coord_flip() +
   scale_y_continuous(labels = absolute_format())
 ```
 
 * Os óbitos estão concentrados nas faixas etárias mais velhas;
+
+
+
+**Número de óbitos residentes por Doenças do Aparelho Respiratório, segundo faixa etária e Grupo da CID-10, Santo André, 2008-2017**
+```{r fig_obitos_idade_tipo_respiratorias, fig.height=10, fig.width=15}
+
+obitos_por_idade_e_causas <- sim_obt10_mun(
+  municipio = 354780,
+  linha = "Grupo CID-10",
+  coluna = "Faixa Etária",
+  periodo = c(as.character(2008:2017)),
+  capitulo_cid10 = 10 # Doenças do Aparelho Respiratório
+)
+
+temp <-
+  obitos_por_idade_e_causas %>%
+  filter(!str_detect(obitos_por_idade_e_causas$`Grupo CID-10`, "^\\.")) %>%
+  pivot_longer(2:13, names_to = "Faixa Etária", values_to = "Óbitos") %>%
+  select("Grupo CID-10", "Faixa Etária", "Óbitos") %>%
+  filter(`Grupo CID-10` != "TOTAL") %>%
+  mutate(
+    `Faixa Etária` = factor(
+      `Faixa Etária`,
+      levels = unique(`Faixa Etária`),
+      ordered = TRUE
+      )
+  ) %>%
+  filter(!(is.na(`Óbitos`)))
+
+temp2 <- 
+  temp %>%
+  group_by(`Grupo CID-10`) %>%
+  summarise(sum(`Óbitos`))
+
+temp3 <- 
+  left_join(temp, temp2) %>%
+  mutate(
+    # `Grupo CID-10` = fct_lump(
+    #   `Grupo CID-10`,
+    #   n = 5,
+    #   w = `sum(obitos)`,
+    #   other_level = "Outros"
+    #   ),
+    `Grupo CID-10` = fct_reorder(
+      `Grupo CID-10`,`Óbitos`, sum,.desc = TRUE
+      )
+  )
+
+temp3 %>%
+  ggplot() +
+    geom_col(
+      aes(x = `Faixa Etária`, y = `Óbitos`, fill = `Grupo CID-10`),
+      position = position_stack(reverse = TRUE)
+      ) +
+    scale_fill_fish_d(option = "Hypsypops_rubicundus", direction = 1)
+```
+
+* A Influenza e a Pneumonia foram as principais responsáveis pelos óbitos por Doenças do Aparelho Respiratório;
+* Em segundo lugar aparecem as Doenças Crônicas das Vias Aéreas Inferiores.
 
 
 
