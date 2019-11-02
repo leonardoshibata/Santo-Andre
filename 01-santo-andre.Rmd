@@ -52,9 +52,9 @@ library(scales)
 
 ### 1.1.1. Envelhecimento Populacional
 
-**Figura X—Pirâmide Etária, Santo André, 2000 e 2010**
+**Pirâmide Etária, Santo André, 2000 e 2010**
 
-```{r figx_piramide_etaria, cache=TRUE}
+```{r fig_piramide_etaria, cache=TRUE}
 # Dowload dos dados do site do IBGE
 # População por sexo e faixa etária para criação de uma pirâmide populacional
 # Censos de 2000 e 2010
@@ -123,11 +123,11 @@ ggplot(data = piramide2, aes(x = `Faixa Etária`, fill = Sexo)) +
 
 
 
-### 1.1.2 Causas de Morte
+### 1.1.2. Causas de Morte
 
 **Número e proporção acumulada de óbitos residentes, segundo Capítulo da CID-10, Santo André, 2008-2017**
 
-```{r figx_obitos_causas, fig.height=7, fig.width=7}
+```{r fig_obitos_causas, fig.height=7, fig.width=7}
 obitos_por_causas <- sim_obt10_mun(
   municipio = 354780,
   linha = "Capítulo CID-10",
@@ -151,6 +151,46 @@ obitos_por_causas %>% filter(`Capítulo CID-10` != "TOTAL") %>%
 * Cerca de 80% de todos os óbitos estão concentrados em 5 capítulos da CID-10;
 * A principal causa de morte foram as Doenças do Aparelho Circulatório, responsáveis por cerca de 35% de todos os óbitos;
 * A segunda principal causa de morte foram as Neoplasias, seguidas das Doenças do Aparelho Circulatório, das Causas Externas de Morbidade e Mortalidade e das Doenças do Aparelho Digestivo.
+
+
+
+
+**Número de óbitos residentes, por faixa etária e Capítulo da CID-10, Santo André, 2008-2017**
+
+```{r fig_obitos_idade_causas, fig.height=8, fig.width=14}
+
+obitos_por_idade_e_causas <- sim_obt10_mun(
+  municipio = 354780,
+  linha = "Capítulo CID-10",
+  coluna = "Faixa Etária",
+  periodo = c(as.character(2008:2017)))
+
+obitos_por_idade_e_causas2 <-
+  obitos_por_idade_e_causas %>%
+  pivot_longer(2:13, names_to = "Faixa Etária", values_to = "obitos") %>%
+  select("Capítulo CID-10", `Faixa Etária`, "obitos") %>%
+  filter(`Capítulo CID-10` != "TOTAL",!(is.na(obitos))) %>%
+  mutate(
+    `Capítulo CID-10` = str_replace(`Capítulo CID-10`, "^[:upper:]+\\.[:blank:]*", ""),
+    `Faixa Etária` = factor(
+      `Faixa Etária`,
+      levels = unique(`Faixa Etária`),
+      ordered = TRUE
+      )
+    )
+
+obitos_por_idade_e_causas2 %>%
+  ggplot() +
+  geom_col(aes(
+    x = `Faixa Etária`,
+    y = obitos,
+    fill = reorder(`Capítulo CID-10`, obitos)
+  )) +
+  scale_fill_fish_d(option = "Hypsypops_rubicundus", direction = -1, name = "Capítulo da CID-10")
+```
+
+
+
 
 
 
