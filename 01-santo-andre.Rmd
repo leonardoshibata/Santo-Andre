@@ -295,7 +295,7 @@ ggplot(data = piramide_obitos_cardio2, aes(x = `Faixa Etária`, y = `Óbitos`, f
   scale_y_continuous(labels = absolute_format())
 ```
 
-* Os óbito por Doenças do Aparelho Circulatório estão concentradas nas faixas estárias mais velhas;
+* Os óbitos por Doenças do Aparelho Circulatório estão concentrados nas faixas etárias mais velhas;
 * Porém, nos homens, a faixa etária com o maior número de óbitos foi a de 70 a 79 anos, enquanto nas mulheres, foi a de 80 anos e mais.
 
 
