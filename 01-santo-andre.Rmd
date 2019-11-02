@@ -304,3 +304,68 @@ ggplot(data = piramide_obitos_cancer2, aes(x = `Faixa Etária`, y = `Óbitos`, f
 
 
 
+
+**Número de óbitos masculinos residentes por Neoplasias, segundo faixa etária e Categoria da CID-10, Santo André, 2008-2017**
+```{r fig_obitos_masc_idade_tipo_cancer, fig.height=10, fig.width=15}
+
+obitos_por_idade_e_causas <- sim_obt10_mun(
+  municipio = 354780,
+  linha = "Categoria CID-10",
+  coluna = "Faixa Etária",
+  periodo = c(as.character(2008:2017)),
+  capitulo_cid10 = 2,
+  sexo = "Masc"
+)
+
+temp <- 
+obitos_por_idade_e_causas %>%
+  pivot_longer(2:13, names_to = "Faixa Etária", values_to = "Óbitos") %>%
+  select("Categoria CID-10", "Faixa Etária", "Óbitos") %>%
+  filter(`Categoria CID-10` != "TOTAL") %>%
+  mutate(
+    `Faixa Etária` = factor(
+      `Faixa Etária`,
+      levels = unique(`Faixa Etária`),
+      ordered = TRUE
+      )
+  ) %>%
+  filter(!(is.na(`Óbitos`)))
+
+temp2 <- 
+  temp %>%
+  group_by(`Categoria CID-10`) %>%
+  summarise(sum(`Óbitos`))
+
+temp3 <- 
+  left_join(temp, temp2) %>% mutate(
+    `Categoria CID-10` = fct_lump(
+      `Categoria CID-10`,
+      n = 5,
+      w = `sum(Óbitos)`,
+      other_level = "Outros"
+      ),
+    `Categoria CID-10` = fct_reorder(
+      `Categoria CID-10`,`Óbitos`, sum,.desc = TRUE
+      )
+  )
+
+temp3 %>%
+  ggplot() +
+    geom_col(
+      aes(x = `Faixa Etária`, y = `Óbitos`, fill = `Categoria CID-10`),
+      position = position_stack(reverse = TRUE)
+      ) +
+    scale_fill_fish_d(option = "Hypsypops_rubicundus", direction = 1)
+```
+
+* Câncer que mais matou: de Pulmão;
+* Seguido do de próstata (aumento a partir da faixa etária dos 60 a 69 anos);
+
+
+
+
+
+
+
+
+
