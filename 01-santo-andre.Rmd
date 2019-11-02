@@ -183,6 +183,7 @@ obitos_por_causas %>% filter(`Capítulo CID-10` != "TOTAL") %>%
   ggplot(aes(x = reorder(`Capítulo CID-10`, -`Óbitos p/Residênc`))) +
     geom_col(aes(y = `Óbitos p/Residênc`, fill = `Capítulo CID-10`)) +
     geom_line(aes(y = proporcao_acumulada, group = 1)) +
+    geom_text(aes(y = `Óbitos p/Residênc`*0.5, label = `Óbitos p/Residênc`), size = 3) +
     scale_y_continuous(sec.axis = sec_axis(trans = ~./16718*100, name = "% acum.", breaks = 1:10*10)) +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
     xlab("Capítulo CID-10") + ylab("Óbitos") +
@@ -279,7 +280,17 @@ absolute_format <- function(accuracy = 1, scale = 1, prefix = "",
 
 ggplot(data = piramide_obitos_cardio2, aes(x = `Faixa Etária`, y = `Óbitos`, fill = Sexo)) +
   geom_col(data = piramide_obitos_cardio2[piramide_obitos_cardio2$Sexo=="Masc",], aes(y = -`Óbitos`)) +
+  geom_text(
+    data = piramide_obitos_cardio2[piramide_obitos_cardio2$Sexo=="Masc",],
+    aes(label = `Óbitos`, y = -(`Óbitos`*0.5+100)),
+    size = 3
+    ) +
   geom_col(data = piramide_obitos_cardio2[piramide_obitos_cardio2$Sexo=="Fem",]) +
+  geom_text(
+    data = piramide_obitos_cardio2[piramide_obitos_cardio2$Sexo=="Fem",],
+    aes(label = `Óbitos`, y = `Óbitos`*0.5+100),
+    size=3
+    ) +
   coord_flip() +
   scale_y_continuous(labels = absolute_format())
 ```
