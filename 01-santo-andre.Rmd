@@ -150,7 +150,7 @@ obitos_por_causas %>% filter(`Capítulo CID-10` != "TOTAL") %>%
 ```
 * Cerca de 80% de todos os óbitos estão concentrados em 5 capítulos da CID-10;
 * A principal causa de morte foram as Doenças do Aparelho Circulatório, responsáveis por cerca de 35% de todos os óbitos;
-* A segunda principal causa de morte foram as Neoplasias, seguidas das Doenças do Aparelho Circulatório, das Causas Externas de Morbidade e Mortalidade e das Doenças do Aparelho Digestivo.
+* A segunda principal causa de morte foram as Neoplasias, seguidas das Doenças do Aparelho Respiratório, das Causas Externas de Morbidade e Mortalidade e das Doenças do Aparelho Digestivo.
 
 
 
@@ -429,6 +429,63 @@ temp3 %>%
 
 
 
+### 1.1.4. Doenças do Aparelho Respiratório
 
+### 1.1.5. Causas Externas
+
+**Número de óbitos por Causas Externas, segundo sexo e faixa etária, Santo André, 2008-2017**
+
+```{r fig_piramide_obitos_causasexternas}
+piramide_obitos_causas_externas <- sim_obt10_mun(
+  municipio = 354780,
+  linha = "Faixa Etária",
+  coluna = "Sexo",
+  periodo = c(as.character(2008:2017)),
+  capitulo_cid10 = 20
+)
+
+piramide_obitos_causas_externas2 <-  piramide_obitos_causas_externas %>%
+  pivot_longer(cols = c("Masc", "Fem"),
+               names_to = "Sexo",
+               values_to = "Óbitos") %>%
+  filter(!(`Faixa Etária` %in% c("TOTAL", "Idade ignorada"))) %>%
+  mutate(faixa_etaria = factor(`Faixa Etária`,
+                               levels = unique(`Faixa Etária`),
+                               ordered = TRUE))%>%
+  select(`Faixa Etária` = faixa_etaria, Sexo, `Óbitos`)
+
+
+
+# Plota
+absolute_format <- function(accuracy = 1, scale = 1, prefix = "",
+                          suffix = "", big.mark = ".", decimal.mark = ",",
+                          trim = TRUE, ...) {
+  function(x) number(
+      abs(x),
+      accuracy = accuracy,
+      scale = scale,
+      prefix = prefix,
+      suffix = suffix,
+      big.mark = big.mark,
+      decimal.mark = decimal.mark,
+      trim = trim,
+      ...
+    )
+}
+
+ggplot(data = piramide_obitos_causas_externas2, aes(x = `Faixa Etária`, y = `Óbitos`, fill = Sexo)) +
+  geom_col(data = piramide_obitos_causas_externas2[piramide_obitos_causas_externas2$Sexo=="Masc",], aes(y = -`Óbitos`)) +
+  geom_col(data = piramide_obitos_causas_externas2[piramide_obitos_causas_externas2$Sexo=="Fem",]) +
+  coord_flip() +
+  scale_y_continuous(labels = absolute_format())
+```
+
+
+
+
+
+
+
+### 1.1.6. Doenças do Aparelho Digestivo.
 
 
