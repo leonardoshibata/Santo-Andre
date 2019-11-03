@@ -280,12 +280,12 @@ absolute_format <- function(accuracy = 1, scale = 1, prefix = "",
 
 ggplot(data = piramide_obitos_cardio2, aes(x = `Faixa Etária`, y = `Óbitos`, fill = Sexo)) +
   geom_col(data = piramide_obitos_cardio2[piramide_obitos_cardio2$Sexo=="Masc",], aes(y = -`Óbitos`)) +
+  geom_col(data = piramide_obitos_cardio2[piramide_obitos_cardio2$Sexo=="Fem",]) +
   geom_text(
     data = piramide_obitos_cardio2[piramide_obitos_cardio2$Sexo=="Masc",],
     aes(label = `Óbitos`, y = -(`Óbitos`*0.5+100)),
     size = 3
     ) +
-  geom_col(data = piramide_obitos_cardio2[piramide_obitos_cardio2$Sexo=="Fem",]) +
   geom_text(
     data = piramide_obitos_cardio2[piramide_obitos_cardio2$Sexo=="Fem",],
     aes(label = `Óbitos`, y = `Óbitos`*0.5+100),
@@ -420,7 +420,7 @@ temp3 %>%
 
 **Número de óbitos residentes por Doenças do Aparelho Circulatório, segundo faixa etária e Grupo da CID-10, Santo André, 2008-2017**
 
-```{r fig_obitos_idade_tipo_cardiovasculares, fig.height=10, fig.width=15}
+```{r fig_obitos_idade_tipo_cardiovasculares, fig.height=8, fig.width=15}
 
 obitos_por_idade_e_causas <- sim_obt10_mun(
   municipio = 354780,
@@ -532,6 +532,16 @@ absolute_format <- function(accuracy = 1, scale = 1, prefix = "",
 ggplot(data = piramide_obitos_cancer2, aes(x = `Faixa Etária`, y = `Óbitos`, fill = Sexo)) +
   geom_col(data = piramide_obitos_cancer2[piramide_obitos_cancer2$Sexo=="Masc",], aes(y = -`Óbitos`)) +
   geom_col(data = piramide_obitos_cancer2[piramide_obitos_cancer2$Sexo=="Fem",]) +
+  geom_text(
+    data = piramide_obitos_cancer2[piramide_obitos_cancer2$Sexo=="Masc",],
+    aes(label = `Óbitos`, y = -(`Óbitos`*0.5+50)),
+    size = 3
+    ) +
+  geom_text(
+    data = piramide_obitos_cancer2[piramide_obitos_cancer2$Sexo=="Fem",],
+    aes(label = `Óbitos`, y = `Óbitos`*0.5+50),
+    size=3
+    ) +
   coord_flip() +
   scale_y_continuous(labels = absolute_format())
 ```
