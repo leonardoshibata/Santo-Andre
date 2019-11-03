@@ -723,6 +723,16 @@ absolute_format <- function(accuracy = 1, scale = 1, prefix = "",
 ggplot(data = piramide_obitos_respiratorias2, aes(x = `Faixa Etária`, y = `Óbitos`, fill = Sexo)) +
   geom_col(data = piramide_obitos_respiratorias2[piramide_obitos_respiratorias2$Sexo=="Masc",], aes(y = -`Óbitos`)) +
   geom_col(data = piramide_obitos_respiratorias2[piramide_obitos_respiratorias2$Sexo=="Fem",]) +
+  geom_text(
+    data = piramide_obitos_respiratorias2[piramide_obitos_respiratorias2$Sexo=="Masc",],
+    aes(label = `Óbitos`, y = -(`Óbitos`*0.5+50)),
+    size = 3
+    ) +
+  geom_text(
+    data = piramide_obitos_respiratorias2[piramide_obitos_respiratorias2$Sexo=="Fem",],
+    aes(label = `Óbitos`, y = `Óbitos`*0.5+50),
+    size=3
+    ) +
   coord_flip() +
   scale_y_continuous(labels = absolute_format())
 ```
