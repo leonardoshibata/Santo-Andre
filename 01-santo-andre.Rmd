@@ -8,42 +8,9 @@ editor_options:
   chunk_output_type: inline
 ---
 
-```{r setup}
+```{r setup, include=FALSE}
 library(tidyverse)
-
-# Libraries to IMPORT data
-library(pins) # pins remote resources into a local cache to work offline
-library(readxl) # Read Excel Files
-library(read.dbc) # read datasus dbc files
-
-# Libraries for Databases
-library(DBI)
-library(odbc)
-
-# Libraries to TIDY data
-library(janitor) # simple functions for examining and cleaning dirty data
-
-# Libraries to TRANSFORM data
-
-# Libraries to VISUALIZE data
 library(fishualize) # Visualization of fish color palette
-
-
-# Libraries to MODEL data
-#library(broom) # summarizes key information about models in tidy tibble()s.
-#library(corrr) # is a package for exploring correlations in R
-#library(infer) # perform statistical inference
-
-# Other useful libraries
-#library(here) # helps accessing files relative to a project root to stop the working directory insanity
-library(RVerbalExpressions) # Create regular expressions easily
-library(beepr) # Easily Play Notification Sounds on any Platform
-#library(feather) # legacy. fast, interoperable binary data frame storage for R and python
-library(arrow) # substitutes *feather* package and introduces *parquet* file type (hadoop) - fast and small. the gold standard
-library(fst) # fst file type. faster than *parquet* but larger file size. good for ssd (can read from disk as if in memmory, see fst())
-
-
-
 library(sidrar)
 library(datasus)
 library(scales)
